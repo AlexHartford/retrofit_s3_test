@@ -10,7 +10,7 @@ import retrofit2.http.Url
 interface ApiService {
     @PUT
     suspend fun uploadFile(
-        @Header("Content-Type") contentType: String,
+//        @Header("Content-Type") contentType: String,
         @Url uploadUrl: String,
         @Body file: RequestBody
     ): Response<Unit>
