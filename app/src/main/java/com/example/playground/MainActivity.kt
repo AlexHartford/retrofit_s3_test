@@ -13,7 +13,10 @@ import com.example.playground.ui.theme.PlaygroundTheme
 import com.example.playground.network.RetrofitClientInstance.retrofitInstance
 import kotlinx.coroutines.runBlocking
 import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import java.io.File
+import java.io.FileOutputStream
 import java.io.InputStream
 
 
@@ -24,13 +27,21 @@ class MainActivity : ComponentActivity() {
             ApiService::class.java
         )
 
-        val `in`: InputStream = resources.openRawResource(R.raw.alextest)
-        val buf = ByteArray(`in`.available())
-        val requestBody: RequestBody =
-            buf.toRequestBody(null, 0, buf.size)
+        val `in`: InputStream = resources.openRawResource(R.raw.alextest4)
+//        val buf = ByteArray(`in`.available())
+//
+//        val requestBody: RequestBody =
+//            buf.toRequestBody(null, 0, buf.size)
+
+        val file = File(cacheDir, "test.mp4")
+
+        copyStreamToFile(`in`, file)
+
+        val requestBody: RequestBody = file.asRequestBody(null)
+
         runBlocking {
             service.uploadFile(
-                uploadUrl = "https://banter-videos.s3.amazonaws.com/alextest.mp4?AWSAccessKeyId=ASIA3MNZRCZ7XKZQKGX6&Signature=DYaSAyJdwQYrnO3YShkqA5mGIv4%3D&x-amz-security-token=IQoJb3JpZ2luX2VjEGYaCXVzLWVhc3QtMSJGMEQCIBGXDuQz2bMI3mmWx6I092yCr4LSno8nLQL7XDWN7UFOAiBTuROcJal63RFLkBlxEgHkUNk%2FEtHmgC0cspLt80jLryqZAgi%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F8BEAAaDDc4MjYxMDAxMTc3NSIMqL2Z8QT2d4hCfwvlKu0Bi8WwQp49aoL7e2UqbiL5TIVfSZtA9icBWY9Pj737%2FkVX8m8UPtM7l6n9uDWEFFvUVi0uN%2FktyGyVatVYnFx2sFv7qHNSzNDh1XcqPWnV1GTuKa0PaoLqhmWfD88Q7Jv1aGHkoRgDuFwV6RgyDgW5WNgriM%2BV1aC886Ljf5W%2BWABs6Uir0JPIMc3GCS2vMx4FTYG6VauKQKttSQVwpiouDJgnfrZ2ZRRXKLGTMuZkJh4J9Xlup9O5IlcBPqE%2FSkaIG%2FriydByfVt1u2z5s7oNK5fbqDB66RF%2B4vF3RbApRIr%2BKAFxn8YF0qS3pw78MMv7nIoGOpsBXH4hCtPcEDuoZg9ZNIUh%2FZI%2B9dWLDgP%2BJsCCposfbnwnwWT94CTtHDCdshD6b5Wty%2FgTc3W1%2BMBDTHcmAs%2BHH%2B8O8BlUIOV0EI4rmMm6W0zTF3ZCpsHL929WQuo%2Bz0PUlzYkue4QOz3vgA%2FuSlnhw7pYxjzy5AB3GN0A%2FE2j311fhViTzQ5tM1lLKqIGjFNSRg5sX7GKi6Tw0hI%3D&Expires=1632062429",
+                uploadUrl = "https://banter-videos.s3.amazonaws.com/alextest5.mp4?AWSAccessKeyId=ASIA3MNZRCZ7Q5P3O75M&Signature=CMrUR%2BzNsaDNPj6G%2BzmB9ped2hs%3D&x-amz-security-token=IQoJb3JpZ2luX2VjEG0aCXVzLWVhc3QtMSJHMEUCIQCfAw%2BHJTfIGmbOEbv2tW6D1e5t1kSQrnyS1tsemySKHwIgJAUfTurj0sfnfNfiMPJHJtA%2FAzYJs5pUfclbszdS09AqmQIIxf%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FARAAGgw3ODI2MTAwMTE3NzUiDJE%2Bof%2BlnmppVto9AyrtAVEYWFIUje1Ib9deeY0d0sI%2FiIDFspXKrnilNXlGceXnycsUmSsnXcNrvQfWlVqYojbxoSEb%2BlV2yDUQhg9%2FSCPl5h3fgdsbkR3nBsjEcY66SaVTfI2jTRHshna1x2317pV2gNp2QlVe1qHN1K1yv8Ut4CH7SwxFMBD8bq27W13LmiJFohqKTOg%2FypuPUrB%2F6SESy7KkZYu%2BBgjTV%2FhaO06ugjv02blQ2iMvmdk71CPlmZ%2BNvq4xo0dqNtWHxhi8Zov%2F1W03pUdCslt0q%2B8HBsPtEYGARBYGt3P8YMlGI9LSIUHrKlNzsCQqwMghCTDQsp6KBjqaAZApc6I6XWuYeiKn3jebbuV4FQz2zNhV%2FiWohr8%2FvhAx0CzXsf%2BNf2xrOX90GEV2D08WLa2WaKd9LgNj%2FgFxT2lCOv9BGmJe%2FlDG0XYKZRsub4wB2PfyOsg%2FsVOzDlmTRPCuW2bKFsBpVnb2U6%2FFzvuNqz8bpWeGdVeP9N6rSp7nMi4BkS0EtAqUBChin0i1IAxIEaFsqQQTVa0%3D&Expires=1632085858",
                 file = requestBody
             )
         }
@@ -52,6 +63,22 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
+fun copyStreamToFile(inputStream: InputStream, outputFile: File) {
+    inputStream.use { input ->
+        val outputStream = FileOutputStream(outputFile)
+        outputStream.use { output ->
+            val buffer = ByteArray(4 * 1024) // buffer size
+            while (true) {
+                val byteCount = input.read(buffer)
+                if (byteCount < 0) break
+                output.write(buffer, 0, byteCount)
+            }
+            output.flush()
+        }
+    }
+}
+
 
 @Composable
 fun Greeting(name: String) {
